@@ -338,10 +338,33 @@ mark.ok{background:#bbf7d0;color:#14532d;padding:0 2px;border-radius:3px}
 .money{position:absolute;inset:0;z-index:46;background:radial-gradient(circle,#7f1d1d,#000);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;font-family:sans-serif;text-align:center;padding:20px}
 .money .yen{font-size:60px;font-weight:900;color:#fca5a5;animation:slam2 .4s both;text-shadow:0 0 20px rgba(239,68,68,.8)}
 .money p{font-size:14px;line-height:1.8;margin-top:10px;animation:fadein .5s 1.2s both}
+.phone.suck{animation:suck .95s cubic-bezier(.55,0,.85,.35) forwards;z-index:10}
+@keyframes suck{0%{transform:scale(1)}18%{transform:scale(.93) rotate(-2deg)}100%{transform:scale(var(--s)) rotate(4deg);filter:blur(3px) brightness(1.7)}}
+body.sucking{background:#000;transition:background .7s}
+.warp{position:fixed;inset:0;pointer-events:none;z-index:5;background:repeating-conic-gradient(from 0deg,rgba(124,58,237,.0) 0 6deg,rgba(167,139,250,.35) 6deg 7deg);animation:warp .95s ease-in forwards}
+@keyframes warp{from{opacity:0;transform:scale(.4) rotate(0)}to{opacity:1;transform:scale(2.2) rotate(40deg)}}
+#screen.arrive{animation:arrive .7s ease-out}
+@keyframes arrive{from{opacity:0;filter:blur(10px) brightness(2)}to{opacity:1;filter:none}}
+body.full{background:#000}
+body.full .phone{width:100vw;height:100vh;padding:0;border-radius:0;box-shadow:none;background:#000}
+body.full .screen{position:absolute;left:0;top:0;border-radius:0;transform-origin:0 0}
+body.full .body,body.full .chips,body.full .choice,body.full .guide,body.full .inputbar,body.full .fine{padding-left:max(14px,calc((100% - 720px)/2));padding-right:max(14px,calc((100% - 720px)/2))}
+body.full .home{padding-left:max(20px,calc((100% - 560px)/2));padding-right:max(20px,calc((100% - 560px)/2))}
+body.full .title,body.full .intro,body.full .ds,body.full .fin{padding-left:max(22px,calc((100% - 620px)/2));padding-right:max(22px,calc((100% - 620px)/2))}
+body.full .ah{padding-left:max(12px,calc((100% - 760px)/2))}
+body.full .notif{left:50%;right:auto;width:min(480px,calc(100% - 20px));transform:translate(-50%,-140%)}
+body.full .notif.show{transform:translate(-50%,0)}
+body.full .modal .box{max-width:480px}
+.title,.ds{overflow-y:auto}
+#fsb{display:none;position:absolute;top:5px;right:64px;z-index:60;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:8px;font-size:11px;padding:3px 8px;font-weight:700}
+body.full #fsb{display:block}
+body.full .photos.g2,body.full .post,body.full .map,body.full .scan .sp{max-width:440px;margin-left:auto;margin-right:auto}
+body.full .photos.g2{margin-bottom:12px}
 </style>
 </head>
 <body>
 <div class="phone" id="phone">
+  <button id="fsb" onclick="toggleFs()">⛶ 全画面にする</button>
   <div class="screen" id="screen">
     <div class="status" id="status"></div>
     <div class="view" id="view"></div>
@@ -457,14 +480,41 @@ function moneyFlash(done){
   T.push(setTimeout(function(){o.remove();if(done)done()},4200));
 }
 
+/* ===== スマホに吸い込まれて全画面へ ===== */
+var FULL=false;
+function layoutFull(){if(!FULL)return;var W=innerWidth,H=innerHeight,z=Math.min(1.5,Math.max(1,H/640));var sc=$('#screen');sc.style.width=(W/z)+'px';sc.style.height=(H/z)+'px';sc.style.transform='scale('+z+')'}
+window.addEventListener('resize',layoutFull);
+function isFs(){return !!(document.fullscreenElement||document.webkitFullscreenElement)}
+function reqFs(){try{var el=document.documentElement,f=el.requestFullscreen||el.webkitRequestFullscreen;if(f){var p=f.call(el);if(p&&p.catch)p.catch(function(){})}}catch(e){}}
+function toggleFs(){if(isFs()){(document.exitFullscreen||document.webkitExitFullscreen).call(document)}else reqFs()}
+function updFsb(){var b=$('#fsb');if(b)b.textContent=isFs()?'⤡ 全画面をやめる':'⛶ 全画面にする'}
+document.addEventListener('fullscreenchange',function(){updFsb();setTimeout(layoutFull,50)});
+function whoosh(){var a=ac();if(!a||!soundOn)return;var o=a.createOscillator(),g=a.createGain(),t=a.currentTime;o.type='sawtooth';o.frequency.setValueAtTime(120,t);o.frequency.exponentialRampToValueAtTime(1800,t+.9);g.gain.setValueAtTime(.001,t);g.gain.exponentialRampToValueAtTime(.12,t+.6);g.gain.exponentialRampToValueAtTime(.001,t+1);o.connect(g);g.connect(a.destination);o.start(t);o.stop(t+1.05);
+  setTimeout(function(){tone(1568,0,.25,'triangle',.08);tone(2093,.08,.35,'triangle',.07)},950)}
+function enterFull(cb){
+  if(FULL){cb();return}
+  ac();reqFs();whoosh();
+  setTimeout(function(){
+    var ph=$('#phone'),r=ph.getBoundingClientRect();
+    ph.style.setProperty('--s',Math.max(innerWidth/r.width,innerHeight/r.height)*1.25);
+    var wp=document.createElement('div');wp.className='warp';document.body.appendChild(wp);
+    document.body.classList.add('sucking');ph.classList.add('suck');
+    setTimeout(function(){
+      FULL=true;wp.remove();document.body.classList.add('full');ph.classList.remove('suck');ph.style.removeProperty('--s');layoutFull();updFsb();
+      var sc=$('#screen');sc.classList.add('arrive');setTimeout(function(){sc.classList.remove('arrive')},750);
+      cb();
+    },950);
+  },120);
+}
+
 /* ================= タイトル・導入 ================= */
 V.title=function(){return '<div class="title">'+
   '<div class="t-badge">生成AI・情報モラル シミュレーション</div><h1>スマホの中の<br>3日間</h1>'+
   '<p>中学2年生になって、自分のスマホを手に入れたあなた。<br>3日間スマホを使って過ごしながら、<br>AIやネットとのつきあい方を体験しよう。</p>'+
-  '<button class="btn" onclick="ac();introPage=0;go(\'intro\')">はじめる</button>'+
+  '<button class="btn" onclick="enterFull(function(){introPage=0;go(\'intro\')})">はじめる</button>'+
   '<label class="snd"><input type="checkbox" '+(soundOn?'checked':'')+' onchange="soundOn=this.checked"> 音を出す</label>'+
   '<button class="chap" onclick="showChap=!showChap;render()">日にちを選んで始める（先生用）</button>'+
-  (showChap?'<div class="chaplist"><button onclick="ac();startDay(1)">1日目</button><button onclick="ac();startDay(2)">2日目</button><button onclick="ac();startDay(3)">3日目</button><button onclick="ac();startQuiz()">まとめ問題</button></div>':'')+
+  (showChap?'<div class="chaplist"><button onclick="enterFull(function(){startDay(1)})">1日目</button><button onclick="enterFull(function(){startDay(2)})">2日目</button><button onclick="enterFull(function(){startDay(3)})">3日目</button><button onclick="enterFull(startQuiz)">まとめ問題</button></div>':'')+
   '<div class="credit">© Irie Kanji</div></div>'};
 var INTRO=[
   function(){return '<div class="step">1 / 3　この教材について</div><h2>失敗して学ぶ<br>シミュレーション</h2>'+
