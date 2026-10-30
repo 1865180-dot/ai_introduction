@@ -550,7 +550,7 @@ V.intro=function(){
 /* ================= 日の開始 ================= */
 var DAYS={
   1:{title:'AIで宿題',theme:'テーマ：ハルシネーション（AIのまちがい）',when:'水曜日　16:40',story:'学校から帰ってきたあなた。スマホに、担任の入江先生からメッセージが届いたようです。',mission:'先生から出された宿題を完成させて、提出しよう'},
-  2:{title:'AIに相談',theme:'テーマ：AIと個人情報',when:'木曜日　20:30',story:'宿題も終わった夜。最近ひかるは、困ったことがあると何でも「ミライAI」に相談しています。今日は、友だちのミサキとけんかしてしまいました……',mission:'ミライAIに、悩みや書類のことを手伝ってもらおう'},
+  2:{title:'AIに相談',theme:'テーマ：AIと個人情報',when:'木曜日　20:30',story:'宿題も終わった夜。最近ひかるは、困ったことがあると何でも「ミライAI」に相談しています。今日は、友だちのミサキとけんかしてしまいました。それに、明日は「進路希望調査票」の提出日です……',mission:'ミライAIに、悩みや書類のことを手伝ってもらおう'},
   3:{title:'AIとSNS',theme:'テーマ：個人情報',when:'金曜日　16:30',story:'クラスで、写真を投稿するSNS「つながりグラム」がはやっています。あなたも今日、アカウントを作ってみることにしました。',mission:'プロフィールを作って、最初の写真を投稿しよう'},
   4:{title:'ネットのわな',theme:'テーマ：ネット詐欺・アカウント乗っ取り',when:'土曜日　10:00',story:'今日は学校が休み。人気ゲーム「スターランナー」のイベント最終日です。でも、スマホにはいろいろなメッセージやニュースが届きます……',mission:'届いたメッセージやニュースに、正しく対応しよう'}
 };
@@ -559,7 +559,7 @@ function startDay(n){
   var b={screen:'daystart',day:n,badge:{}};
   if(n===1){b.time='16:40';b.wd='水曜日';b.round=1;b.phase='work';b.teacherRead=false;b.friendMsgs=0;b.ai=[aiHello()];b.aiAsked=false;b.aiDone={};b.bpage=null;b.visited={};b.lib=null;b.ans={year:'',route:'',src:[]};b.msgs=[];b.hist=[];b.last=null}
   if(n===3){b.time='16:30';b.wd='金曜日';b.round=1;b.chatRead=false;b.ai=[aiHello()];b.aiStep=0;b.info={};b.show={};b.profile=null;b.sstep='post';b.pub='all';b.photo=null;b.cap=null;b.geo=true;b.posted=false;b.night=false;b.likes=0;b.dm=[];b.dmStarted=false;b.dmReady=false;b.dmChoice=null;b.dmDone=false;b.tries2=0;b.ok2=false;b.r1=null}
-  if(n===2){b.time='20:30';b.wd='木曜日';b.chatRead=false;b.ai=[aiHello()];b.pstep=0;b.p2asked=false;b.c1=null;b.c2=null;b.c3=null;b.adShown=false;b.readTerms=false;b.wait=false}
+  if(n===2){b.time='20:30';b.wd='木曜日';b.chatRead=false;b.ai=[aiHello()];b.pstep=0;b.p2asked=false;b.teacherNote=false;b.noteRead=false;b.lq=0;b.lStarted=false;b.c1=null;b.c2=null;b.c3=null;b.adShown=false;b.readTerms=false;b.wait=false}
   if(n===4){b.time='10:00';b.wd='土曜日';b.trap=1;b.t={};b.wait=true;b.sms=[];b.chat3=[];b.web=null;b.bpage=null;b.warn=false;b.cd=59;b.newsRead=false;b.hackStarted=false;b.hacked=false;b.causeSeen=false;b.sec={rec:false,pw:null,pwMsg:'',svc:{game:false,sns:false,mail:false},svcDone:false,svcMsg:'',tfa:false,told:false};b.secured=false;b.codeAsk=false}
   S=b;render();
 }
@@ -803,13 +803,15 @@ function rv1(){
 var HIKARU=['🙂','#dbeafe','ひかる'];
 function chatP(){
   S.chatRead=true;
-  var h=header('ミサキ','#16a34a')+'<div class="body" data-bottom="1">';
-  h+=sys('── 今日の放課後 ──');
+  if(S.teacherNote)S.noteRead=true;
+  var h=header('チャット','#16a34a')+'<div class="body" data-bottom="1">';
+  h+=sys('── 🎀 ミサキ（今日の放課後）──');
   h+=me('ミサキ、さっきはごめん。言い方きつかったかも');
   h+=cmsg(MISAKI,'別に。もういいよ');
   h+=cmsg(MISAKI,'ひかるって、いつも自分の話ばっかりだよね');
   h+=me('そんなつもりじゃなかった…');
   h+=cmsg(MISAKI,'しばらく話したくない');
+  if(S.teacherNote)h+=sys('── 👨‍🏫 2年1組 クラスチャット ──')+cmsg(TEACHER,'【連絡】明日は「進路希望調査票」の提出日です。\n志望理由の欄も、自分の言葉でていねいに書いておきましょう。','pop')+cmsg(YUTA,'やべ、志望理由まだ書いてない😱','pop');
   if(S.pstep>=4&&S.c1==='A')h+=sys('── 3週間後 ──')+cmsg(MISAKI,'ねえ…私とのLINE、AIに貼ったでしょ？\nネットに出てるって、クラスの子から聞いた。\n名前もアイコンも全部見えてた。最低。','pop');
   return h+'</div>'}
 var SHOT1='<div class="shot"><div class="shot-h">📱 スクリーンショット</div><div><b>佐藤 美咲</b>（ミサキ）🎀</div><div>「ひかるって、いつも自分の話ばっかりだよね」</div><div>「しばらく話したくない」</div><div class="shot-f">2年1組 グループ ／ 既読 12</div></div>';
@@ -818,13 +820,14 @@ function aiChipsP(){
   if(typingNow)return '<span style="font-size:12px;color:#6b7280">ミライAIが入力中…</span>';
   if(S.pstep===0)return '<button class="chip" onclick="pAsk1()">友だちとけんかした…相談にのって</button>';
   if(S.pstep===1)return '<div class="form"><div class="fl">どうやって伝える？</div><button class="btn danger" onclick="pAns1(\'A\')">📷 けんかしたチャット画面のスクショを、そのまま貼る</button><button class="btn safe" onclick="pAns1(\'B\')">✏️ 名前を出さずに「友だちと、言い方のことでけんかした」と書く</button></div>';
-  if(S.pstep===2&&!S.p2asked)return '<button class="chip" onclick="pAsk2()">進路希望調査票の「志望理由」を直して</button>';
+  if(S.pstep===2&&!S.noteRead)return '<span style="font-size:12px;color:#6b7280">少しすると、先生から連絡が届きます</span>';
+  if(S.pstep===2&&!S.p2asked)return '<button class="chip" onclick="pAsk2()">明日出す進路希望調査票の「志望理由」がうまく書けない…直して</button>';
   if(S.pstep===2)return '<div class="form"><div class="fl">どうやって送る？</div><button class="btn danger" onclick="pAns2(\'A\')">📄 調査票をまるごと写真で送る</button><button class="btn safe" onclick="pAns2(\'B\')">✏️ 志望理由の文だけをコピーして送る</button></div>';
   return '<span style="font-size:12px;color:#6b7280">相談はここまで。「‹」でホームにもどろう</span>'}
 function pAsk1(){aiSay('友だちとけんかした…相談にのって','つらかったですね😢 よければ、くわしく教えてください。\n\n<b>やりとりの画面をスクリーンショットでそのまま貼ってもらえれば、もっと正確にアドバイスできますよ！</b>',function(){S.pstep=1})}
 function pAns1(c){S.c1=c;var q=c==='A'?SHOT1:'友だちと話していて、わたしの言い方がきつかったみたいで、「自分の話ばっかり」って言われた。どうしたらいい？';
-  aiSay(q,'話してくれてありがとう。\n\nまずは、<b>相手の気持ちを受け止める</b>ことが大切です。「自分の話ばかりしてたかもしれない。気づかなくてごめんね」と、言いわけをせずに伝えてみましょう。\n\nすぐに返事がなくても、少し時間をおいて、相手の話をゆっくり聞く時間をつくると、仲直りしやすくなりますよ😊',function(){S.pstep=2})}
-function pAsk2(){aiSay('進路希望調査票の「志望理由」を直して','いいですよ！📄\n<b>調査票をそのまま写真で送ってくれれば、全体を見てまとめて直しますね。</b>',function(){S.p2asked=true})}
+  aiSay(q,'話してくれてありがとう。\n\nまずは、<b>相手の気持ちを受け止める</b>ことが大切です。「自分の話ばかりしてたかもしれない。気づかなくてごめんね」と、言いわけをせずに伝えてみましょう。\n\nすぐに返事がなくても、少し時間をおいて、相手の話をゆっくり聞く時間をつくると、仲直りしやすくなりますよ😊',function(){S.pstep=2;later(function(){S.teacherNote=true;S.badge.chat=1;if(S.screen==='home'||S.screen==='ai')render();notify('💬','チャット','入江先生（2年1組）','【連絡】明日は「進路希望調査票」の提出日です。','chat')},1800)})}
+function pAsk2(){aiSay('明日出す進路希望調査票の「志望理由」がうまく書けない…直して','いいですよ！📄\n<b>調査票をそのまま写真で送ってくれれば、全体を見てまとめて直しますね。</b>',function(){S.p2asked=true})}
 function pAns2(c){S.c2=c;var q=c==='A'?DOC2:'志望理由：「私は、人の役に立つ仕事がしたいので、この高校で勉強したいです。」';
   aiSay(q,'直してみました✨\n\n「私は、将来<b>人の役に立つ仕事</b>につきたいと考えています。そのために、○○に力を入れている貴校で、さまざまなことに挑戦し、自分の力をのばしたいと思い、志望しました。」\n\n○○には、その高校で特に学びたいことを入れてみてくださいね。',function(){S.pstep=3;later(pAd,2500)})}
 function pAd(){S.adShown=true;S.badge.faceapp='new';if(S.screen==='home'||S.screen==='ai')render();notify('🎨','広告','AIアニメ顔メーカー｜無料','顔写真1枚で、あなたがアニメの主人公に！今だけ無料✨','faceapp')}
@@ -854,18 +857,46 @@ function pNext(){
       A2?'  <span class="r">       090-48xx-xxxx／内申38／みどり台高校</span>':'  （個人情報は見つかりませんでした）',
       '&gt; 名簿データとして出品中… '+(any?'<span class="r">あり</span>':'なし')],
       any?'📤 個人情報が流出<small>AIに入れた情報は、あなたの手をはなれて広がりました</small>':'✅ 個人情報はなし<small>会話は流出したけれど、個人情報を入れていなかったので被害はありませんでした</small>',
-      function(){S.wait=false;go('after')})},3200);
+      function(){S.wait=false;S.lq=0;go('learned')})},3200);
   });
 }
 function afterEvents(){
   var e=[];
   e.push({i:'📰',t:'ミライAIの会話履歴が流出',d:'AIの会社が不正アクセスを受け、38万人分の会話がネットに出回った。',bad:false});
+  if(S.c1==='A'||S.c2==='A'||S.c3==='A')e.push({i:'🧠',t:'AIが学習して、知らない人への答えに',d:'あなたが入れた'+[S.c1==='A'?'ミサキのメッセージ':'',S.c2==='A'?'調査票（住所・成績）':'',S.c3==='A'?'顔写真（アプリから売られたもの）':''].filter(Boolean).join('・')+'をAIが学習し、別の町の中学生への答えの中に出してしまった。一度学習されたものは、取り消すのがとても難しい。',bad:true});
   if(S.c1==='A')e.push({i:'🎀',t:'ミサキとの会話がネットに',d:'スクショに写っていたミサキの名前・アイコン・メッセージが、掲示板に貼られた。ミサキから「最低」と言われ、仲直りがもっと難しくなった。',bad:true});
   if(S.c2==='A')e.push({i:'📞',t:'知らない会社から電話とDM',d:'「青木ひかる様　みどり台高校志望とのことで…」。住所・電話・成績が名簿として売られ、知らない塾や業者から連絡が来るようになった。',bad:true});
   if(S.c3==='A')e.push({i:'🎭',t:'あなたの顔のにせアカウント',d:'アニメ顔アプリに渡した顔写真で「hikaru_aoki_official」というにせアカウントが作られ、あなたの顔を使った加工動画も出回り始めた。',bad:true});
   if(S.c3==='A')e.push({i:'📰',t:'「無料AI加工アプリ、顔写真を販売か」',d:'あのアプリは、集めた顔写真と名前を海外の会社に売っていたとニュースになった。消してほしいとたのんでも、もう消せない。',bad:true});
   if(S.c1!=='A'&&S.c2!=='A'&&S.c3!=='A')e.push({i:'🛡',t:'あなたの被害はゼロ',d:'会話は流出したけれど、名前・住所・顔写真などを入れていなかったので、だれのことかわからなかった。',bad:false});
   return e}
+var OTHER=['🧒','#e0e7ff','別の町の中学生'];
+function learnedQA(){
+  var A1=S.c1==='A',A2=S.c2==='A',A3=S.c3==='A';
+  return [
+    ['友だちとけんかしたときの、相手のメッセージの例を見せて',A1?'たとえば、こんなメッセージがあります👇\n<mark class="ng">「ひかるって、いつも自分の話ばっかりだよね」\n「しばらく話したくない」\n（佐藤 美咲さん より）</mark>':'たとえば「最近、話を聞いてもらえなくてさみしかった」のように、自分の気持ちを伝えるメッセージがあります。',A1],
+    ['みどり台高校に行きたい人の、志望理由の例を書いて',A2?'<mark class="ng">さくら台に住む青木ひかるさん（内申38）</mark>は、こう書いていました👇\n「私は、人の役に立つ仕事がしたいので、この高校で勉強したいです。」':'「私は、〇〇に力を入れている貴校で…」のように、その高校で学びたいことを具体的に書くとよいですよ。',A2],
+    ['中学生の顔写真の見本を作って',A3?'こちらはいかがですか？👇\n<div class="ph" style="width:150px;border-radius:10px;margin-top:6px;border:3px solid #e03131"><img src="'+IMG.A+'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></div><mark class="ng">（学習した写真をもとに作成）</mark>':'こちらはいかがですか？👇\n<div style="font-size:60px;line-height:1.2">🧑‍🎓</div>（イラストの見本です）',A3]
+  ]}
+V.learned=function(){
+  var qa=learnedQA(),any=qa.some(function(x){return x[2]});
+  if(!S.lStarted){S.lStarted=true;
+    qa.forEach(function(x,i){
+      later(function(){S.lq=i*2+1;SND.send();if(S.screen==='learned')render()},800+i*3200);
+      later(function(){S.lq=i*2+2;if(x[2]){SND.err();shake()}else SND.note();if(S.screen==='learned')render()},2200+i*3200)});
+    later(function(){S.lq=99;if(S.screen==='learned')render()},800+qa.length*3200)}
+  var h=header('📱 別の町の中学生のスマホ','#475569',"go('home')")+'<div class="body" data-bottom="1">';
+  h+='<div class="card" style="background:#fef3c7;font-size:13px">同じころ、あなたのことを知らない<b>別の町の中学生</b>が、ミライAIを使っていました。<br><span style="font-size:11px;color:#92400e">ミライAI：会話を「AIの学習」に使う設定 … <b>オン（はじめの設定）</b></span></div>';
+  qa.forEach(function(x,i){
+    if(S.lq>=i*2+1)h+='<div class="msg me pop"><div class="bub" style="background:#64748b">'+x[0]+'</div></div>';
+    if(S.lq>=i*2+2)h+=cmsg(['✨','#ede9fe','ミライAI'],x[1],'pop');
+    else if(S.lq===i*2+1)h+='<div class="msg"><div class="av" style="background:#ede9fe">✨</div><div class="bub typing"><span></span><span></span><span></span></div></div>';
+  });
+  if(S.lq===99){
+    h+=any?'<div class="card pop" style="border:3px solid #e03131;text-align:center"><b style="color:#b91c1c;font-size:16px">🧠 あなたの情報が、知らない人への答えに使われた</b><br><span style="font-size:13px">あなたがAIに入れた情報をAIが学習し、まったく知らない人への答えの中に出してしまいました。</span></div>':'<div class="card pop" style="border:3px solid #22c55e;text-align:center"><b style="color:#15803d;font-size:16px">🛡 あなたの情報は出てこなかった</b><br><span style="font-size:13px">個人情報を入れていなかったので、AIが学習しても、あなたのことは答えに出てきませんでした。</span></div>';
+    h+='<button class="btn primary" onclick="go(\'after\')">次へ ▶</button>';
+  }
+  return h+'</div>'};
 V.after=function(){
   var ev=afterEvents(),h=header('3週間後に起きたこと','#1f2430',"go('home')")+'<div class="body">';
   h+='<div style="font-size:14px;line-height:1.7;margin-bottom:10px"><b>あの夜、AIに入れた情報は、その後どうなったのでしょう？</b></div><ul class="dossier">';
@@ -875,10 +906,13 @@ V.after=function(){
   return h+'<button class="btn primary" style="margin-top:8px" onclick="go(\'reveal\')">ふりかえりへ ▶</button></div>'};
 function gP(s){
   if(S.wait)return{t:'少し待とう……'};
+  if(S.pstep>=4&&s==='learned')return S.lq===99?{t:'ボタンを押して先に進もう'}:{t:'別の町の中学生が、ミライAIに質問しています。答えをよく見てみよう'};
   if(S.pstep>=4)return s==='after'?{t:'起きたことを読んだら、下のボタンでふりかえりをしよう'}:{t:'下のボタンで先に進もう'};
   if(!S.chatRead)return{t:'「チャット」を開いて、ミサキとのやりとりを見てみよう',app:'chat'};
   if(s==='chat')return{t:'読んだら、左上の「‹」でホーム画面にもどろう'};
-  if(S.pstep<3){if(s!=='ai')return{t:S.pstep<2?'「ミライAI」を開いて、ミサキとのことを相談してみよう':'「ミライAI」で、進路希望調査票の「志望理由」を直してもらおう',app:'ai'};
+  if(S.pstep===2&&!S.noteRead)return S.teacherNote?{t:'入江先生から連絡が来た。「チャット」を開いて読もう',app:'chat'}:{t:'少し待とう……'};
+  if(S.pstep===2&&s==='chat')return{t:'読んだら「‹」でホームにもどろう'};
+  if(S.pstep<3){if(s!=='ai')return{t:S.pstep<2?'「ミライAI」を開いて、ミサキとのことを相談してみよう':'明日提出の進路希望調査票。志望理由がうまく書けないので、「ミライAI」に直してもらおう',app:'ai'};
     if(S.pstep===1||(S.pstep===2&&S.p2asked))return{t:'AIにどうやって伝えるか、自分で考えて選ぼう'};
     return{t:'下の紫色のボタンを押して、AIにお願いしよう'}}
   if(!S.adShown)return{t:'少し待とう……'};
@@ -898,14 +932,14 @@ function rvP(){
   h+='<div class="note-s">💡 気づいた？　名前をかくしても、AIのアドバイスは<b>まったく同じ</b>でした。個人情報がなくても、AIはちゃんと手伝ってくれます。</div>';
   h+='<h3>🔄 AIに入れた情報は、どこへ行く？</h3><div class="flow">'+
     '<div class="fb2"><b>① 会社のサーバーに保存される</b>入力した文章や写真は、AIの会社のコンピューターに送られ、記録されます。</div><div class="ar">▼</div>'+
-    '<div class="fb2"><b>② AIの学習や、人のチェックに使われることがある</b>サービスによっては、会話をAIの学習に使ったり、会社の人が内容を確認したりします。</div><div class="ar">▼</div>'+
+    '<div class="fb2" style="border:2px solid #e03131"><b style="color:#e03131">② AIの学習に使われ、ほかの人への答えに出ることがある</b>サービスによっては、会話をAIの学習に使います。AIは学習したものを覚えてしまうことがあり、<b>研究では、学習データに入っていた名前や電話番号を、AIがそのまま答えてしまう例</b>も見つかっています。一度学習されたものを取り消すのは、とても難しいです。会社の人が会話を確認する場合もあります。</div><div class="ar">▼</div>'+
     '<div class="fb2" style="border:2px solid #e03131"><b style="color:#e03131">③ 流出することがある</b>不具合や不正アクセスで、会話が外にもれることがあります。ゲーム会社と同じで、<b>使う人には防げません</b>。</div></div>';
   h+='<div class="card" style="font-size:13px">📌 <b>実際にあったこと</b><br>・2023年、海外の大手AIチャットで不具合があり、一部の利用者に<b>ほかの人の会話の題名</b>が見えてしまいました。<br>・2023年、会社員が<b>仕事の秘密の情報</b>をAIチャットに入力してしまい、会社がAIの使用を制限しました。<br>・2025年、AIチャットの「共有リンク」で公開された会話が、<b>検索サイトで見つかる</b>状態になっていたことが話題になりました。</div>';
   h+='<h3>✅ AIを安全に使う5つのポイント</h3><ul class="tips">'+
     '<li><b>🔐 名前・住所・電話・学校・顔写真は入れない</b><br>AIに入れる前に「これ、ネットに公開されても平気？」と考えよう。</li>'+
     '<li><b>👥 友だちや家族の情報も入れない</b><br>スクショや写真には、他人の名前や顔も写っています。他人の個人情報を勝手に渡すことになります。</li>'+
     '<li><b>✂️ 必要な部分だけ、名前は「Aさん」に</b><br>書類はまるごと送らず、相談したい部分だけを。名前は「友だち」「Aさん」におきかえても、AIはちゃんと答えてくれます。</li>'+
-    '<li><b>⚙️ 設定と年齢制限を確認する</b><br>多くのAIには「会話を学習に使わない」設定があります。また、年齢制限（13歳以上、18歳未満は保護者の同意など）があるサービスも多いので、おうちの人と確認しよう。</li>'+
+    '<li><b>⚙️ 設定と年齢制限を確認する</b><br>多くのAIには「会話を学習に使わない」設定があります（はじめは「使う」になっていることが多い）。また、年齢制限（13歳以上、18歳未満は保護者の同意など）があるサービスも多いので、おうちの人と確認しよう。</li>'+
     '<li><b>🎨 「無料」のアプリに顔写真をわたさない</b><br>無料のかわりに、顔や名前のデータを集めて売っているアプリもあります。使う前に利用規約を読み、あやしければ使わない。</li></ul>';
   h+='<div class="point"><small>2日目のポイント</small>AIに入れたことは、<br>だれかに見られるかもしれない</div>';
   h+='<div style="margin-top:16px"><button class="btn primary" onclick="startDay(3)">3日目へ進む ▶</button>'+(bad?'<button class="btn" onclick="startDay(2)">↺ 2日目をやり直す</button>':'')+'</div>';
